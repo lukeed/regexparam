@@ -2,7 +2,7 @@
   "name": "regexparam",
   "version": "0.0.0",
   "repository": "lukeed/regexparam",
-  "description": "WIP",
+  "description": "A tiny (299B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
   "module": "dist/regexparam.es.js",
   "main": "dist/regexparam.js",
   "license": "MIT",
@@ -22,7 +22,11 @@
   "files": [
     "dist"
   ],
-  "keywords": [],
+  "keywords": [
+    "regexp",
+    "route",
+    "routing"
+  ],
   "devDependencies": {
     "gzip-size": "^3.0.0",
     "mk-dirs": "^1.0.0",
