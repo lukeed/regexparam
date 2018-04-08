@@ -1,5 +1,6 @@
 let sep = '/';
-function test(str) {
+
+export default function (str) {
 	let c, o, l, arr=str.split(sep);
 	(arr[0] === '') && arr.shift();
 
@@ -14,11 +15,12 @@ function test(str) {
 		} else if (c === 58) {
 			o = tmp.charCodeAt(l-1) === 63; // optional?
 			keys.push( tmp.substring(1, o ? l-1 : l) );
-			pattern += o ? '(?:/([^/]+?))?(?:/)?' : sep + '([^/]+?)?';
+			pattern += o ? '(?:/([^/]+?))?' : sep + '([^/]+?)';
 		} else {
 			pattern += sep + tmp;
 		}
 	}
+	keys.length && (pattern += '(?:/)?');
 	pattern = new RegExp('^' + pattern + '\/?$', 'i');
 	return { keys, pattern };
 }
