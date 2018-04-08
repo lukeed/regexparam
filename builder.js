@@ -1,7 +1,7 @@
 const fs = require('fs');
 const mkdir = require('mk-dirs');
 const { resolve } = require('path');
-const { minify } = require('uglify-js');
+const { minify } = require('uglify-es');
 const imports = require('rewrite-imports');
 const pretty = require('pretty-bytes');
 const sizer = require('gzip-size');
