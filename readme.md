@@ -13,7 +13,7 @@ Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this modu
 * Optional Parameters (`/:title?`, `/books/:title?`, `/books/:genre/:title?`)
 * Wildcards (`*`, `/books/*`, `/books/:genre/*`)
 
-Lastly, please note that while this route-parser is not slow, you should use [`matchit`](https://github.com/lukeed/matchit#benchmarks) or [`trouter`](https://github.com/lukeed/trouter) if performance is of critical importance. This is epsecially true for backend/server scenarios!
+Lastly, please note that while this route-parser is not slow, you should use [`matchit`](https://github.com/lukeed/matchit#benchmarks) or [`trouter`](https://github.com/lukeed/trouter) if performance is of critical importance. This is especially true for backend/server scenarios!
 
 This module exposes two module definitions:
 
