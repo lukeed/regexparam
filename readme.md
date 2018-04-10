@@ -6,14 +6,14 @@ With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regul
 
 An object with shape of `{ keys, pattern }` is returned, where `pattern` is the `RegExp` and `keys` is an array of your parameter name(s) in the order that they appeared.
 
-Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this module does not create a `keys` dictionary, nor mutate an existing variable. Also, this only ships a parser, which only accept strings. Simiarly, and most importantly, `regexparam` **only** handles basic pathing operators:
+Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this module does not create a `keys` dictionary, nor mutate an existing variable. Also, this only ships a parser, which only accept strings. Similarly, and most importantly, `regexparam` **only** handles basic pathing operators:
 
 * Static (`/foo`, `/foo/bar`)
 * Parameter (`/:title`, `/books/:title`, `/books/:genre/:title`)
 * Optional Parameters (`/:title?`, `/books/:title?`, `/books/:genre/:title?`)
 * Wildcards (`*`, `/books/*`, `/books/:genre/*`)
 
-Lastly, please note that while this route-parser is not slow, you should use [`matchit`](https://github.com/lukeed/matchit#benchmarks) or [`trouter`](https://github.com/lukeed/trouter) if performance is of critical importance. This is epsecially true for backend/server scenarios!
+Lastly, please note that while this route-parser is not slow, you should use [`matchit`](https://github.com/lukeed/matchit#benchmarks) or [`trouter`](https://github.com/lukeed/trouter) if performance is of critical importance. This is especially true for backend/server scenarios!
 
 This module exposes two module definitions:
 
@@ -74,7 +74,7 @@ Type: `String`
 
 The route/pathing string to convert.
 
-> **Note:** It does not matter if your `str` begins with a `/` -- it will be added if missing.
+> **Note:** It does not matter if your `str` begins with a `/` &mdash; it will be added if missing.
 
 ## License
 
