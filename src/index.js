@@ -15,9 +15,9 @@ export default function (str) {
 			pattern += '/' + tmp;
 		}
 	}
-	keys.length && (pattern += '(?:/)?');
+
 	return {
 		keys: keys,
-		pattern: new RegExp('^' + pattern + '\/?$', 'i')
+		pattern: new RegExp('^' + pattern + (keys.length ? '(?:/)?' : '') + '\/?$', 'i')
 	};
 }
