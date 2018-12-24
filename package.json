@@ -1,6 +1,6 @@
 {
   "name": "regexparam",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": "lukeed/regexparam",
   "description": "A tiny (252B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
   "module": "dist/regexparam.mjs",
