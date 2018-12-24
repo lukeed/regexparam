@@ -1,7 +1,6 @@
 const fs = require('fs');
 const mkdir = require('mk-dirs');
 const { minify } = require('terser');
-const imports = require('rewrite-imports');
 const pretty = require('pretty-bytes');
 const sizer = require('gzip-size');
 const pkg = require('./package');
@@ -12,12 +11,11 @@ mkdir('dist').then(_ => {
 	// Copy as is for ESM
 	fs.writeFileSync(pkg.module, data);
 
-	// Mutate imports for CJS
-	data = imports(data).replace(/export default/, 'module.exports =');
+	// Mutate exports for CJS
+	data = data.replace(/export default/, 'module.exports =');
 	fs.writeFileSync(pkg.main, data);
 
 	// Uglify & print gzip size
 	const { code } = minify(data, { toplevel:true });
-	const int = sizer.sync(code);
-	console.log(`> gzip size: ${pretty(int)}`);
+	console.log(`> gzip size: ${pretty(sizer.sync(code))}`);
 });
