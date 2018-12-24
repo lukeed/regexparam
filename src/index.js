@@ -3,12 +3,12 @@ export default function (str) {
 	arr[0] || arr.shift();
 
 	while (tmp = arr.shift()) {
-		c = tmp.charCodeAt(0);
-		if (c === 42) {
+		c = tmp[0];
+		if (c === '*') {
 			keys.push('wild');
 			pattern += '/(.*)';
-		} else if (c === 58) {
-			o = tmp.charCodeAt(tmp.length - 1) === 63; // optional?
+		} else if (c === ':') {
+			o = tmp[tmp.length - 1] === '?'; // optional?
 			keys.push( tmp.substring(1, o ? tmp.length - 1 : tmp.length) );
 			pattern += o ? '(?:/([^/]+?))?' : '/([^/]+?)';
 		} else {
