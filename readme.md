@@ -17,7 +17,7 @@ Lastly, please note that while this route-parser is not slow, you should use [`m
 
 This module exposes two module definitions:
 
-* **ES Module**: `dist/regexparam.es.js`
+* **ES Module**: `dist/regexparam.mjs`
 * **CommonJS**: `dist/regexparam.js`
 
 ## Install
