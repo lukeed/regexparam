@@ -10,8 +10,7 @@ let data = fs.readFileSync('src/index.js', 'utf8');
 
 mkdir('dist').then(_ => {
 	// Copy as is for ESM
-	let es5 = data.replace(/let/g, 'var').replace('{ keys, pattern }', '{ keys:keys, pattern:pattern }');
-	fs.writeFileSync(pkg.module, es5);
+	fs.writeFileSync(pkg.module, data);
 
 	// Mutate imports for CJS
 	data = imports(data).replace(/export default/, 'module.exports =');

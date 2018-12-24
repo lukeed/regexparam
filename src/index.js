@@ -1,10 +1,10 @@
-let sep = '/';
+var sep = '/';
 
 export default function (str) {
-	let c, o, l, arr=str.split(sep);
+	var c, o, l, arr=str.split(sep);
 	(arr[0] === '') && arr.shift();
 
-	let i=0, tmp, keys=[], pattern='';
+	var i=0, tmp, keys=[], pattern='';
 	for (; i < arr.length; i++) {
 		l = (tmp=arr[i]).length;
 		if (l === 0) continue;
@@ -21,6 +21,8 @@ export default function (str) {
 		}
 	}
 	keys.length && (pattern += '(?:/)?');
-	pattern = new RegExp('^' + pattern + '\/?$', 'i');
-	return { keys, pattern };
+	return {
+		keys: keys,
+		pattern: new RegExp('^' + pattern + '\/?$', 'i')
+	};
 }
