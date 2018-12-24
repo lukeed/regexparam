@@ -34,6 +34,6 @@
     "rewrite-imports": "^1.0.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
-    "uglify-es": "^3.3.9"
+    "terser": "^3.13.1"
   }
 }
