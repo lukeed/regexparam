@@ -5,14 +5,19 @@ function run(route, url, loose) {
 	let i=0, out={}, result=fn(route, !!loose);
   let matches = result.pattern.exec(url);
   if (matches === null) return false;
-	  while (i < result.keys.length) {
-	    out[ result.keys[i] ] = matches[++i] || null;
-	  }
+  while (i < result.keys.length) {
+    out[ result.keys[i] ] = matches[++i] || null;
+  }
   return out;
 }
 
 test.Test.prototype.toExec = function (route, url, params) {
 	let out = run(route, url);
+	this.same(out, params, out ? `~> parsed "${url}" into correct params` : `~> route and "${url}" did not match`);
+};
+
+test.Test.prototype.toLooseExec = function (route, url, params) {
+	let out = run(route, url, true);
 	this.same(out, params, out ? `~> parsed "${url}" into correct params` : `~> route and "${url}" did not match`);
 };
 
@@ -283,6 +288,72 @@ test('execs', t => {
 	t.toExec('/books/*?', '/books/world/', { wild:'world/' });
 	t.toExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
 	t.toExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
+
+	t.end();
+});
+
+test('execs :: loose', t => {
+	// false = did not match
+
+	console.log('/books');
+	t.toLooseExec('/books', '/', false);
+	t.toLooseExec('/books', '/books', {});
+	t.toLooseExec('/books', '/books/', {});
+	t.toLooseExec('/books', '/books/world/', {});
+	t.toLooseExec('/books', '/books/world', {});
+
+	console.log('/:title');
+	t.toLooseExec('/:title', '/hello', { title:'hello' });
+	t.toLooseExec('/:title', '/hello/', { title:'hello' });
+	t.toLooseExec('/:title', '/hello/world/', { title:'hello' });
+	t.toLooseExec('/:title', '/hello/world', { title:'hello' });
+	t.toLooseExec('/:title', '/', false);
+
+	console.log('/:title?');
+	t.toLooseExec('/:title?', '/', { title:null });
+	t.toLooseExec('/:title?', '/hello', { title:'hello' });
+	t.toLooseExec('/:title?', '/hello/', { title:'hello' });
+	t.toLooseExec('/:title?', '/hello/world/', { title:'hello' });
+	t.toLooseExec('/:title?', '/hello/world', { title:'hello' });
+
+	console.log('/:title.mp4');
+	t.toLooseExec('/:title.mp4', '/hello.mp4', { title:'hello' });
+	t.toLooseExec('/:title.mp4', '/hello.mp4/', { title:'hello' });
+	t.toLooseExec('/:title.mp4', '/hello.mp4/history/', { title:'hello' });
+	t.toLooseExec('/:title.mp4', '/hello.mp4/history', { title:'hello' });
+	t.toLooseExec('/:title.mp4', '/', false);
+
+	console.log('/:title/:genre');
+	t.toLooseExec('/:title/:genre', '/hello/world', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre', '/hello/world/', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre', '/hello/world/mundo/', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre', '/hello/world/mundo', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre', '/hello/', false);
+	t.toLooseExec('/:title/:genre', '/hello', false);
+
+	console.log('/:title/:genre?');
+	t.toLooseExec('/:title/:genre?', '/hello', { title:'hello', genre:null });
+	t.toLooseExec('/:title/:genre?', '/hello/', { title:'hello', genre:null });
+	t.toLooseExec('/:title/:genre?', '/hello/world', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre?', '/hello/world/', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre?', '/hello/world/mundo/', { title:'hello', genre:'world' });
+	t.toLooseExec('/:title/:genre?', '/hello/world/mundo', { title:'hello', genre:'world' });
+
+	console.log('/books/*');
+	t.toLooseExec('/books/*', '/books', false);
+	t.toLooseExec('/books/*', '/books/', { wild:null });
+	t.toLooseExec('/books/*', '/books/world', { wild:'world' });
+	t.toLooseExec('/books/*', '/books/world/', { wild:'world/' });
+	t.toLooseExec('/books/*', '/books/world/howdy', { wild:'world/howdy' });
+	t.toLooseExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
+
+	console.log('/books/*?');
+	t.toLooseExec('/books/*?', '/books', false);
+	t.toLooseExec('/books/*?', '/books/', { wild:null });
+	t.toLooseExec('/books/*?', '/books/world', { wild:'world' });
+	t.toLooseExec('/books/*?', '/books/world/', { wild:'world/' });
+	t.toLooseExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
+	t.toLooseExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
 
 	t.end();
 });
