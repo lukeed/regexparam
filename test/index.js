@@ -1,15 +1,19 @@
 const test = require('tape');
 const fn = require('../dist/regexparam');
 
-test.Test.prototype.isMatch = function (route, url, params) {
-  let i=0, out={}, result=fn(route);
+function run(route, url, loose) {
+	let i=0, out={}, result=fn(route, !!loose);
   let matches = result.pattern.exec(url);
-  if (matches !== null) {
+  if (matches === null) return false;
 	  while (i < result.keys.length) {
 	    out[ result.keys[i] ] = matches[++i] || null;
 	  }
-  }
-  this.same(out, params, `~> parsed "${url}" into correct params`);
+  return out;
+}
+
+test.Test.prototype.toExec = function (route, url, params) {
+	let out = run(route, url);
+	this.same(out, params, out ? `~> parsed "${url}" into correct params` : `~> route and "${url}" did not match`);
 };
 
 test('regexparam', t => {
@@ -218,47 +222,67 @@ test('wildcard :: root', t => {
 });
 
 test('execs', t => {
+	// false = did not match
+
+	console.log('/books');
+	t.toExec('/books', '/', false);
+	t.toExec('/books', '/books', {});
+	t.toExec('/books', '/books/', {});
+	t.toExec('/books', '/books/world/', false);
+	t.toExec('/books', '/books/world', false);
+
 	console.log('/:title');
-	t.isMatch('/:title', '/hello', { title:'hello' });
-	t.isMatch('/:title', '/hello/', { title:'hello' });
+	t.toExec('/:title', '/hello', { title:'hello' });
+	t.toExec('/:title', '/hello/', { title:'hello' });
+	t.toExec('/:title', '/hello/world/', false);
+	t.toExec('/:title', '/hello/world', false);
+	t.toExec('/:title', '/', false);
 
 	console.log('/:title?');
-	t.isMatch('/:title?', '/', { title:null });
-	t.isMatch('/:title?', '/hello', { title:'hello' });
-	t.isMatch('/:title?', '/hello/', { title:'hello' });
+	t.toExec('/:title?', '/', { title:null });
+	t.toExec('/:title?', '/hello', { title:'hello' });
+	t.toExec('/:title?', '/hello/', { title:'hello' });
+	t.toExec('/:title?', '/hello/world/', false);
+	t.toExec('/:title?', '/hello/world', false);
 
 	console.log('/:title.mp4');
-	t.isMatch('/:title.mp4', '/', {});
-	t.isMatch('/:title.mp4', '/hello.mp4', { title:'hello' });
-	t.isMatch('/:title.mp4', '/hello.mp4/', { title:'hello' });
+	t.toExec('/:title.mp4', '/hello.mp4', { title:'hello' });
+	t.toExec('/:title.mp4', '/hello.mp4/', { title:'hello' });
+	t.toExec('/:title.mp4', '/hello.mp4/history/', false);
+	t.toExec('/:title.mp4', '/hello.mp4/history', false);
+	t.toExec('/:title.mp4', '/', false);
 
 	console.log('/:title/:genre');
-	t.isMatch('/:title/:genre', '/hello', {});
-	t.isMatch('/:title/:genre', '/hello/', {});
-	t.isMatch('/:title/:genre', '/hello/world', { title:'hello', genre:'world' });
-	t.isMatch('/:title/:genre', '/hello/world/', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre', '/hello/world', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre', '/hello/world/', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre', '/hello/world/mundo/', false);
+	t.toExec('/:title/:genre', '/hello/world/mundo', false);
+	t.toExec('/:title/:genre', '/hello/', false);
+	t.toExec('/:title/:genre', '/hello', false);
 
 	console.log('/:title/:genre?');
-	t.isMatch('/:title/:genre?', '/hello', { title:'hello', genre:null });
-	t.isMatch('/:title/:genre?', '/hello/', { title:'hello', genre:null });
-	t.isMatch('/:title/:genre?', '/hello/world', { title:'hello', genre:'world' });
-	t.isMatch('/:title/:genre?', '/hello/world/', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre?', '/hello', { title:'hello', genre:null });
+	t.toExec('/:title/:genre?', '/hello/', { title:'hello', genre:null });
+	t.toExec('/:title/:genre?', '/hello/world', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre?', '/hello/world/', { title:'hello', genre:'world' });
+	t.toExec('/:title/:genre?', '/hello/world/mundo/', false);
+	t.toExec('/:title/:genre?', '/hello/world/mundo', false);
 
 	console.log('/books/*');
-	t.isMatch('/books/*', '/books', {});
-	t.isMatch('/books/*', '/books/', { wild:null });
-	t.isMatch('/books/*', '/books/world', { wild:'world' });
-	t.isMatch('/books/*', '/books/world/', { wild:'world/' });
-	t.isMatch('/books/*', '/books/world/howdy', { wild:'world/howdy' });
-	t.isMatch('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
+	t.toExec('/books/*', '/books', false);
+	t.toExec('/books/*', '/books/', { wild:null });
+	t.toExec('/books/*', '/books/world', { wild:'world' });
+	t.toExec('/books/*', '/books/world/', { wild:'world/' });
+	t.toExec('/books/*', '/books/world/howdy', { wild:'world/howdy' });
+	t.toExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
 
 	console.log('/books/*?');
-	t.isMatch('/books/*?', '/books', {});
-	t.isMatch('/books/*?', '/books/', { wild:null });
-	t.isMatch('/books/*?', '/books/world', { wild:'world' });
-	t.isMatch('/books/*?', '/books/world/', { wild:'world/' });
-	t.isMatch('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
-	t.isMatch('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
+	t.toExec('/books/*?', '/books', false);
+	t.toExec('/books/*?', '/books/', { wild:null });
+	t.toExec('/books/*?', '/books/world', { wild:'world' });
+	t.toExec('/books/*?', '/books/world/', { wild:'world/' });
+	t.toExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
+	t.toExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
 
 	t.end();
 });
