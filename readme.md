@@ -1,6 +1,6 @@
 # regexparam [![Build Status](https://travis-ci.org/lukeed/regexparam.svg?branch=master)](https://travis-ci.org/lukeed/regexparam)
 
-> A tiny (285B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
+> A tiny (276B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
 
 With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regular expression.
 
@@ -45,7 +45,7 @@ function exec(path, result) {
 // Parameter, with Optional Parameter
 // ---
 let foo = regexparam('/books/:genre/:title?')
-// foo.pattern => /^\/books\/([^\/]+?)(?:\/([^\/]+?))?(?:\/)?\/?$/i
+// foo.pattern => /^\/books\/([^\/]+?)(?:\/([^\/]+?))?\/?$/i
 // foo.keys => ['genre', 'title']
 
 foo.pattern.test('/books/horror'); //=> true
@@ -61,7 +61,7 @@ exec('/books/horror/goosebumps', foo);
 // Parameter, with suffix
 // ---
 let bar = regexparam('/movies/:title.(mp4|mov)');
-// bar.pattern => /^\/movies\/([^\/]+?)\.(mp4|mov)(?:\/)?\/?$/i
+// bar.pattern => /^\/movies\/([^\/]+?)\.(mp4|mov)\/?$/i
 // bar.keys => ['title']
 
 bar.pattern.test('/movies/narnia'); //=> false
@@ -75,7 +75,7 @@ exec('/movies/narnia.mp4', bar);
 // Wildcard
 // ---
 let baz = regexparam('users/*');
-// baz.pattern => /^\/users\/(.*)(?:\/)?\/?$/i
+// baz.pattern => /^\/users\/(.*)\/?$/i
 // baz.keys => ['wild']
 
 baz.pattern.test('/users'); //=> false

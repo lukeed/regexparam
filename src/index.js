@@ -20,6 +20,6 @@ export default function (str) {
 
 	return {
 		keys: keys,
-		pattern: new RegExp('^' + pattern + (keys.length ? '(?:/)?' : '') + '\/?$', 'i')
+		pattern: new RegExp('^' + pattern + '\/?$', 'i')
 	};
 }
