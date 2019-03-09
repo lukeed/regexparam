@@ -103,6 +103,32 @@ test('param :: multiple', t => {
 	t.end();
 });
 
+test('param :: suffix', t => {
+	let { keys, pattern } = fn('/movies/:title.mp4');
+	t.same(keys, ['title'], '~> keys has "title" only (no suffix)');
+	t.false(pattern.test('/movies'), '~> does not match naked base');
+	t.false(pattern.test('/movies/'), '~> does not match naked base w/ trailing slash');
+	t.false(pattern.test('/movies/foo'), '~> does not match without suffix');
+	t.false(pattern.test('/movies/foo.mp3'), '~> does not match with wrong suffix');
+	t.true(pattern.test('/movies/foo.mp4'), '~> does match with correct suffix');
+	t.true(pattern.test('/movies/foo.mp4/'), '~> does match with trailing slash');
+	t.end();
+});
+
+test('param :: suffices', t => {
+	let { keys, pattern } = fn('/movies/:title.(mp4|mov)');
+	t.same(keys, ['title'], '~> keys has "title" only (no suffix)');
+	t.false(pattern.test('/movies'), '~> does not match naked base');
+	t.false(pattern.test('/movies/'), '~> does not match naked base w/ trailing slash');
+	t.false(pattern.test('/movies/foo'), '~> does not match without suffix');
+	t.false(pattern.test('/movies/foo.mp3'), '~> does not match with wrong suffix');
+	t.true(pattern.test('/movies/foo.mp4'), '~> does match with correct suffix (mp4)');
+	t.true(pattern.test('/movies/foo.mp4/'), '~> does match with trailing slash (mp4)');
+	t.true(pattern.test('/movies/foo.mov'), '~> does match with correct suffix (mov)');
+	t.true(pattern.test('/movies/foo.mov/'), '~> does match with trailing slash (mov)');
+	t.end();
+});
+
 test('param :: optional', t => {
 	let { keys, pattern } = fn('/books/:author/:title?');
 	t.same(keys, ['author', 'title'], '~> keys has "author" & "title" values');

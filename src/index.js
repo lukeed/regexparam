@@ -1,5 +1,5 @@
 export default function (str) {
-	var c, o, tmp, keys=[], pattern='', arr=str.split('/');
+	var c, o, tmp, ext, keys=[], pattern='', arr=str.split('/');
 	arr[0] || arr.shift();
 
 	while (tmp = arr.shift()) {
@@ -8,9 +8,11 @@ export default function (str) {
 			keys.push('wild');
 			pattern += '/(.*)';
 		} else if (c === ':') {
-			o = tmp[tmp.length - 1] === '?'; // optional?
-			keys.push( tmp.substring(1, o ? tmp.length - 1 : tmp.length) );
-			pattern += o ? '(?:/([^/]+?))?' : '/([^/]+?)';
+			o = tmp.indexOf('?', 1);
+			ext = tmp.indexOf('.', 1);
+			keys.push( tmp.substring(1, !!~o ? o : !!~ext ? ext : tmp.length) );
+			pattern += !!~o && !~ext ? '(?:/([^/]+?))?' : '/([^/]+?)';
+			if (!!~ext) pattern += (!!~o ? '?' : '') + '\\' + tmp.substring(ext);
 		} else {
 			pattern += '/' + tmp;
 		}
