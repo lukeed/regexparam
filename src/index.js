@@ -1,4 +1,4 @@
-export default function (str) {
+export default function (str, loose) {
 	var c, o, tmp, ext, keys=[], pattern='', arr=str.split('/');
 	arr[0] || arr.shift();
 
@@ -20,6 +20,6 @@ export default function (str) {
 
 	return {
 		keys: keys,
-		pattern: new RegExp('^' + pattern + '\/?$', 'i')
+		pattern: new RegExp('^' + pattern + (loose ? '(?:$|\/)' : '\/?$'), 'i')
 	};
 }

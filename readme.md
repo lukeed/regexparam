@@ -90,17 +90,32 @@ exec('/users/lukeed/repos/new', baz);
 
 ## API
 
-### regexparam(str)
-
+### regexparam(str, loose)
 Returns: `Object`
 
 #### str
-
 Type: `String`
 
 The route/pathing string to convert.
 
 > **Note:** It does not matter if your `str` begins with a `/` &mdash; it will be added if missing.
+
+#### loose
+Type: `Boolean`<br>
+Default: `false`
+
+Should the `RegExp` match URLs that are longer than the [`str`](#str) pattern itself?<br>
+By default, the generated `RegExp` will test that the URL begins and _ends with_ the pattern.
+
+```js
+const rgx = require('regexparam');
+
+rgx('/users').pattern.test('/users/lukeed'); //=> false
+rgx('/users', true).pattern.test('/users/lukeed'); //=> true
+
+rgx('/users/:name').pattern.test('/users/lukeed/repos'); //=> false
+rgx('/users/:name', true).pattern.test('/users/lukeed/repos'); //=> true
+```
 
 
 ## Related
