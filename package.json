@@ -5,6 +5,7 @@
   "description": "A tiny (285B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
   "module": "dist/regexparam.mjs",
   "main": "dist/regexparam.js",
+  "types": "types.d.ts",
   "license": "MIT",
   "author": {
     "name": "Luke Edwards",
@@ -20,6 +21,7 @@
     "test": "tape test/*.js | tap-spec"
   },
   "files": [
+    "*.d.ts",
     "dist"
   ],
   "keywords": [
