@@ -20,6 +20,6 @@ export default function (str, loose) {
 
 	return {
 		keys: keys,
-		pattern: new RegExp('^' + pattern + (loose ? '(?:$|\/)' : '\/?$'), 'i')
+		pattern: new RegExp('^' + pattern + (loose ? '(?=$|\/)' : '\/?$'), 'i')
 	};
 }
