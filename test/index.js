@@ -11,6 +11,10 @@ function run(route, url, loose) {
   return out;
 }
 
+function raw(route, url, loose) {
+	return fn(route, !!loose).pattern.exec(url);
+}
+
 test.Test.prototype.toExec = function (route, url, params) {
 	let out = run(route, url);
 	this.same(out, params, out ? `~> parsed "${url}" into correct params` : `~> route and "${url}" did not match`);
@@ -72,7 +76,8 @@ test('param', t => {
 	t.true(pattern.test('/books/narnia/'), '~> matches definition w/ trailing slash');
 	t.false(pattern.test('/books/narnia/hello'), '~> does not match extra bits');
 	t.false(pattern.test('books/narnia'), '~> does not match path without lead slash');
-	let [_, value] = pattern.exec('/books/narnia');
+	let [url, value] = pattern.exec('/books/narnia');
+	t.is(url, '/books/narnia', '~> executing pattern on correct trimming');
 	t.is(value, 'narnia', '~> executing pattern gives correct value');
 	t.end();
 });
@@ -85,7 +90,8 @@ test('param :: static :: none', t => {
 	t.true(pattern.test('/narnia/'), '~> matches definition w/ trailing slash');
 	t.false(pattern.test('/narnia/reviews'), '~> does not match extra bits');
 	t.false(pattern.test('narnia'), '~> does not match path without lead slash');
-	let [_, value] = pattern.exec('/narnia');
+	let [url, value] = pattern.exec('/narnia/');
+	t.is(url, '/narnia/', '~> executing pattern on correct trimming');
 	t.is(value, 'narnia', '~> executing pattern gives correct value');
 	t.end();
 });
@@ -101,7 +107,8 @@ test('param :: static :: multiple', t => {
 	t.false(pattern.test('foo/bar/narnia'), '~> does not match path without lead slash');
 	t.false(pattern.test('/foo/narnia'), '~> does not match if statics are different');
 	t.false(pattern.test('/bar/narnia'), '~> does not match if statics are different');
-	let [_, value] = pattern.exec('/foo/bar/narnia');
+	let [url, value] = pattern.exec('/foo/bar/narnia');
+	t.is(url, '/foo/bar/narnia', '~> executing pattern on correct trimming');
 	t.is(value, 'narnia', '~> executing pattern gives correct value');
 	t.end();
 });
@@ -117,7 +124,8 @@ test('param :: multiple', t => {
 	t.true(pattern.test('/books/smith/narnia/'), '~> matches definition w/ trailing slash');
 	t.false(pattern.test('/books/smith/narnia/reviews'), '~> does not match extra bits');
 	t.false(pattern.test('books/smith/narnia'), '~> does not match path without lead slash');
-	let [_, author, title] = pattern.exec('/books/smith/narnia');
+	let [url, author, title] = pattern.exec('/books/smith/narnia');
+	t.is(url, '/books/smith/narnia', '~> executing pattern on correct trimming');
 	t.is(author, 'smith', '~> executing pattern gives correct value');
 	t.is(title, 'narnia', '~> executing pattern gives correct value');
 	t.end();
@@ -354,6 +362,209 @@ test('execs :: loose', t => {
 	t.toLooseExec('/books/*?', '/books/world/', { wild:'world/' });
 	t.toLooseExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
 	t.toLooseExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
+
+	t.end();
+});
+
+test('(raw) exec', t => {
+	console.log('/foo ~> "/foo"');
+	let [url, ...vals] = raw('/foo', '/foo');
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+	console.log('/foo ~> "/foo/"');
+	[url, ...vals] = raw('/foo/', '/foo/');
+	t.is(url, '/foo/', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+
+	console.log('/:path ~> "/foo"');
+	[url, ...vals] = raw('/:path', '/foo');
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
+
+	console.log('/:path ~> "/foo/"');
+	[url, ...vals] = raw('/:path', '/foo/');
+	t.is(url, '/foo/', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub ~> "/foo/bar"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar');
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub ~> "/foo/bar/"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar/');
+	t.is(url, '/foo/bar/', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub? ~> "/foo"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo');
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo', undefined], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub? ~> "/foo/"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo/');
+	t.is(url, '/foo/', '~> parsed `url` correctly');
+	t.same(vals, ['foo', undefined], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub? ~> "/foo/bar"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo/bar');
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub? ~> "/foo/bar/"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar/');
+	t.is(url, '/foo/bar/', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/* ~> "/foo/bar/baz"');
+	[url, ...vals] = raw('/:path/*', '/foo/bar/baz');
+	t.is(url, '/foo/bar/baz', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar/baz'], '~> parsed value segments correctly');
+
+	console.log('/:path/* ~> "/foo/bar/baz/"');
+	[url, ...vals] = raw('/:path/*', '/foo/bar/baz/');
+	t.is(url, '/foo/bar/baz/', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar/baz/'], '~> parsed value segments correctly');
+
+
+	console.log('/foo/:path ~> "/foo/bar"');
+	[url, ...vals] = raw('/foo/:path', '/foo/bar');
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['bar'], '~> parsed value segments correctly');
+
+	console.log('/foo/:path ~> "/foo/bar/"');
+	[url, ...vals] = raw('/foo/:path', '/foo/bar/');
+	t.is(url, '/foo/bar/', '~> parsed `url` correctly');
+	t.same(vals, ['bar'], '~> parsed value segments correctly');
+
+	t.end();
+});
+
+test('(raw) exec :: loose', t => {
+	console.log('/foo ~> "/foo"');
+	let [url, ...vals] = raw('/foo', '/foo', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+	console.log('/foo ~> "/foo/"');
+	[url, ...vals] = raw('/foo/', '/foo/', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+
+	console.log('/:path ~> "/foo"');
+	[url, ...vals] = raw('/:path', '/foo', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
+
+	console.log('/:path ~> "/foo/"');
+	[url, ...vals] = raw('/:path', '/foo/', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub ~> "/foo/bar"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub ~> "/foo/bar/"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar/', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub? ~> "/foo"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo', undefined], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub? ~> "/foo/"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo/', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo', undefined], '~> parsed value segments correctly');
+
+
+	console.log('/:path/:sub? ~> "/foo/bar"');
+	[url, ...vals] = raw('/:path/:sub?', '/foo/bar', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+	console.log('/:path/:sub? ~> "/foo/bar/"');
+	[url, ...vals] = raw('/:path/:sub', '/foo/bar/', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar'], '~> parsed value segments correctly');
+
+
+	console.log('/:path/* ~> "/foo/bar/baz"');
+	[url, ...vals] = raw('/:path/*', '/foo/bar/baz', 1);
+	t.is(url, '/foo/bar/baz', '~> parsed `url` correctly');
+	t.same(vals, ['foo', 'bar/baz'], '~> parsed value segments correctly');
+
+	console.log('/:path/* ~> "/foo/bar/baz/"');
+	[url, ...vals] = raw('/:path/*', '/foo/bar/baz/', 1);
+	t.is(url, '/foo/bar/baz/', '~> parsed `url` correctly'); // trail
+	t.same(vals, ['foo', 'bar/baz/'], '~> parsed value segments correctly');
+
+
+	console.log('/foo/:path ~> "/foo/bar"');
+	[url, ...vals] = raw('/foo/:path', '/foo/bar', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['bar'], '~> parsed value segments correctly');
+
+	console.log('/foo/:path ~> "/foo/bar/"');
+	[url, ...vals] = raw('/foo/:path', '/foo/bar/', 1);
+	t.is(url, '/foo/bar', '~> parsed `url` correctly');
+	t.same(vals, ['bar'], '~> parsed value segments correctly');
+
+	t.end();
+});
+
+test('(extra) exec', t => {
+	// Not matches!
+	console.log('/foo ~> "/foo/bar" (extra)');
+	t.is(raw('/foo', '/foo/bar'), null, '~> does not match');
+
+	console.log('/foo ~> "/foo/bar/" (extra)');
+	t.is(raw('/foo/', '/foo/bar/'), null, '~> does not match');
+
+
+	console.log('/:path ~> "/foo/bar" (extra)');
+	t.is(raw('/:path', '/foo/bar'), null, '~> does not match');
+
+	console.log('/:path ~> "/foo/bar/" (extra)');
+	t.is(raw('/:path', '/foo/bar/'), null, '~> does not match');
+
+	t.end();
+});
+
+test('(extra) exec :: loose', t => {
+	console.log('/foo ~> "/foo/bar" (extra)');
+	let [url, ...vals] = raw('/foo', '/foo/bar', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+	console.log('/foo ~> "/foo/bar/" (extra)');
+	[url, ...vals] = raw('/foo/', '/foo/bar/', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, [], '~> parsed value segments correctly');
+
+
+	console.log('/:path ~> "/foo/bar" (extra)');
+	[url, ...vals] = raw('/:path', '/foo/bar', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
+
+	console.log('/:path ~> "/foo/bar/" (extra)');
+	[url, ...vals] = raw('/:path', '/foo/bar/', 1);
+	t.is(url, '/foo', '~> parsed `url` correctly');
+	t.same(vals, ['foo'], '~> parsed value segments correctly');
 
 	t.end();
 });
