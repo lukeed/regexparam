@@ -1,6 +1,8 @@
 const test = require('tape');
 const fn = require('../dist/regexparam');
 
+const hasNamedGroups = 'groups' in /x/.exec('x');
+
 function run(route, url, loose) {
 	let i=0, out={}, result=fn(route, !!loose);
   let matches = result.pattern.exec(url);
@@ -583,186 +585,171 @@ test('(RegExp) static', t => {
 	t.end();
 });
 
-test('(RegExp) param', t => {
-	let rgx = /^\/(?<year>[0-9]{4})/i;
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+if (hasNamedGroups) {
+	test('(RegExp) param', t => {
+		let rgx = /^\/(?<year>[0-9]{4})/i;
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/123'), '~> does not match 3-digit string');
-	t.false(pattern.test('/asdf'), '~> does not match 4 alpha characters');
-	t.true(pattern.test('/2019'), '~> matches definition');
-	t.true(pattern.test('/2019/'), '~> matches definition w/ trailing slash');
-	t.false(pattern.test('2019'), '~> does not match without lead slash');
-	t.true(pattern.test('/2019/narnia/hello'), '~> allows extra bits');
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/123'), '~> does not match 3-digit string');
+		t.false(pattern.test('/asdf'), '~> does not match 4 alpha characters');
+		t.true(pattern.test('/2019'), '~> matches definition');
+		t.true(pattern.test('/2019/'), '~> matches definition w/ trailing slash');
+		t.false(pattern.test('2019'), '~> does not match without lead slash');
+		t.true(pattern.test('/2019/narnia/hello'), '~> allows extra bits');
 
-	// exec results, array access
-	let [url, value] = pattern.exec('/2019/books');
-	t.is(url, '/2019', '~> executing pattern on correct trimming');
-	t.is(value, '2019', '~> executing pattern gives correct value');
+		// exec results, array access
+		let [url, value] = pattern.exec('/2019/books');
+		t.is(url, '/2019', '~> executing pattern on correct trimming');
+		t.is(value, '2019', '~> executing pattern gives correct value');
 
-	// exec results, named object
-	t.toExec(rgx, '/2019/books', { year: '2019' });
-	t.toExec(rgx, '/2019/books/narnia', { year: '2019' });
+		// exec results, named object
+		t.toExec(rgx, '/2019/books', { year: '2019' });
+		t.toExec(rgx, '/2019/books/narnia', { year: '2019' });
 
-	t.end();
-});
+		t.end();
+	});
 
-test('(RegExp) param :: w/ static', t => {
-	let rgx = /^\/books\/(?<title>[a-z]+)/i;
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+	test('(RegExp) param :: w/ static', t => {
+		let rgx = /^\/books\/(?<title>[a-z]+)/i;
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/books'), '~> does not match naked base');
-	t.false(pattern.test('/books/'), '~> does not match naked base w/ trailing slash');
-	t.true(pattern.test('/books/narnia'), '~> matches definition');
-	t.true(pattern.test('/books/narnia/'), '~> matches definition w/ trailing slash');
-	t.true(pattern.test('/books/narnia/hello'), '~> allows extra bits');
-	t.false(pattern.test('books/narnia'), '~> does not match path without lead slash');
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/books'), '~> does not match naked base');
+		t.false(pattern.test('/books/'), '~> does not match naked base w/ trailing slash');
+		t.true(pattern.test('/books/narnia'), '~> matches definition');
+		t.true(pattern.test('/books/narnia/'), '~> matches definition w/ trailing slash');
+		t.true(pattern.test('/books/narnia/hello'), '~> allows extra bits');
+		t.false(pattern.test('books/narnia'), '~> does not match path without lead slash');
 
-	// exec results, array access
-	let [url, value] = pattern.exec('/books/narnia');
-	t.is(url, '/books/narnia', '~> executing pattern on correct trimming');
-	t.is(value, 'narnia', '~> executing pattern gives correct value');
+		// exec results, array access
+		let [url, value] = pattern.exec('/books/narnia');
+		t.is(url, '/books/narnia', '~> executing pattern on correct trimming');
+		t.is(value, 'narnia', '~> executing pattern gives correct value');
 
-	// exec results, named object
-	t.toExec(rgx, '/books/narnia', { title: 'narnia' });
-	t.toExec(rgx, '/books/narnia/hello', { title: 'narnia' });
+		// exec results, named object
+		t.toExec(rgx, '/books/narnia', { title: 'narnia' });
+		t.toExec(rgx, '/books/narnia/hello', { title: 'narnia' });
 
-	t.end();
-});
+		t.end();
+	});
 
-test('(RegExp) param :: multiple', t => {
-	let rgx = /^\/(?<year>[0-9]{4})-(?<month>[0-9]{2})\/(?<day>[0-9]{2})/i;
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+	test('(RegExp) param :: multiple', t => {
+		let rgx = /^\/(?<year>[0-9]{4})-(?<month>[0-9]{2})\/(?<day>[0-9]{2})/i;
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/123-1'));
-	t.false(pattern.test('/123-10'));
-	t.false(pattern.test('/1234-10'));
-	t.false(pattern.test('/1234-10/1'));
-	t.false(pattern.test('/1234-10/as'));
-	t.true(pattern.test('/1234-10/01/'));
-	t.true(pattern.test('/2019-10/30'));
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/123-1'));
+		t.false(pattern.test('/123-10'));
+		t.false(pattern.test('/1234-10'));
+		t.false(pattern.test('/1234-10/1'));
+		t.false(pattern.test('/1234-10/as'));
+		t.true(pattern.test('/1234-10/01/'));
+		t.true(pattern.test('/2019-10/30'));
 
-	// exec results, array access
-	let [url, year, month, day] = pattern.exec('/2019-05/30/');
-	t.is(url, '/2019-05/30', '~> executing pattern on correct trimming');
-	t.is(year, '2019', '~> executing pattern gives correct "year" value');
-	t.is(month, '05', '~> executing pattern gives correct "month" value');
-	t.is(day, '30', '~> executing pattern gives correct "day" value');
+		// exec results, array access
+		let [url, year, month, day] = pattern.exec('/2019-05/30/');
+		t.is(url, '/2019-05/30', '~> executing pattern on correct trimming');
+		t.is(year, '2019', '~> executing pattern gives correct "year" value');
+		t.is(month, '05', '~> executing pattern gives correct "month" value');
+		t.is(day, '30', '~> executing pattern gives correct "day" value');
 
-	// exec results, named object
-	t.toExec(rgx, '/2019-10/02', { year:'2019', month:'10', day:'02' });
-	t.toExec(rgx, '/2019-10/02/narnia', { year:'2019', month:'10', day:'02' });
+		// exec results, named object
+		t.toExec(rgx, '/2019-10/02', { year:'2019', month:'10', day:'02' });
+		t.toExec(rgx, '/2019-10/02/narnia', { year:'2019', month:'10', day:'02' });
 
-	t.end();
-});
+		t.end();
+	});
 
-test('(RegExp) param :: suffix', t => {
-	let rgx = /^\/movies[/](?<title>\w+)\.mp4/i;
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+	test('(RegExp) param :: suffix', t => {
+		let rgx = /^\/movies[/](?<title>\w+)\.mp4/i;
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/movies'));
-	t.false(pattern.test('/movies/'));
-	t.false(pattern.test('/movies/foo'));
-	t.false(pattern.test('/movies/foo.mp3'));
-	t.true(pattern.test('/movies/foo.mp4'));
-	t.true(pattern.test('/movies/foo.mp4/'));
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/movies'));
+		t.false(pattern.test('/movies/'));
+		t.false(pattern.test('/movies/foo'));
+		t.false(pattern.test('/movies/foo.mp3'));
+		t.true(pattern.test('/movies/foo.mp4'));
+		t.true(pattern.test('/movies/foo.mp4/'));
 
-	// exec results, array access
-	let [url, title] = pattern.exec('/movies/narnia.mp4');
-	t.is(url, '/movies/narnia.mp4', '~> executing pattern on correct trimming');
-	t.is(title, 'narnia', '~> executing pattern gives correct "title" value');
+		// exec results, array access
+		let [url, title] = pattern.exec('/movies/narnia.mp4');
+		t.is(url, '/movies/narnia.mp4', '~> executing pattern on correct trimming');
+		t.is(title, 'narnia', '~> executing pattern gives correct "title" value');
 
-	// exec results, named object
-	t.toExec(rgx, '/movies/narnia.mp4', { title: 'narnia' });
-	t.toExec(rgx, '/movies/narnia.mp4/', { title: 'narnia' });
+		// exec results, named object
+		t.toExec(rgx, '/movies/narnia.mp4', { title: 'narnia' });
+		t.toExec(rgx, '/movies/narnia.mp4/', { title: 'narnia' });
 
-	t.end();
-});
+		t.end();
+	});
 
-test('(RegExp) param :: suffices', t => {
-	let rgx = /^\/movies[/](?<title>\w+)\.(mp4|mov)/i;
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+	test('(RegExp) param :: suffices', t => {
+		let rgx = /^\/movies[/](?<title>\w+)\.(mp4|mov)/i;
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/movies'));
-	t.false(pattern.test('/movies/'));
-	t.false(pattern.test('/movies/foo'));
-	t.false(pattern.test('/movies/foo.mp3'));
-	t.true(pattern.test('/movies/foo.mp4'));
-	t.true(pattern.test('/movies/foo.mp4/'));
-	t.true(pattern.test('/movies/foo.mov/'));
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/movies'));
+		t.false(pattern.test('/movies/'));
+		t.false(pattern.test('/movies/foo'));
+		t.false(pattern.test('/movies/foo.mp3'));
+		t.true(pattern.test('/movies/foo.mp4'));
+		t.true(pattern.test('/movies/foo.mp4/'));
+		t.true(pattern.test('/movies/foo.mov/'));
 
-	// exec results, array access
-	let [url, title] = pattern.exec('/movies/narnia.mov');
-	t.is(url, '/movies/narnia.mov', '~> executing pattern on correct trimming');
-	t.is(title, 'narnia', '~> executing pattern gives correct "title" value');
+		// exec results, array access
+		let [url, title] = pattern.exec('/movies/narnia.mov');
+		t.is(url, '/movies/narnia.mov', '~> executing pattern on correct trimming');
+		t.is(title, 'narnia', '~> executing pattern gives correct "title" value');
 
-	// exec results, named object
-	t.toExec(rgx, '/movies/narnia.mov', { title: 'narnia' });
-	t.toExec(rgx, '/movies/narnia.mov/', { title: 'narnia' });
+		// exec results, named object
+		t.toExec(rgx, '/movies/narnia.mov', { title: 'narnia' });
+		t.toExec(rgx, '/movies/narnia.mov/', { title: 'narnia' });
 
-	t.end();
-});
+		t.end();
+	});
 
-test('(RegExp) param :: optional', t => {
-	let rgx = /^\/books[/](?<author>[^/]+)[/]?(?<title>[^/]+)?[/]?$/
-	let { keys, pattern } = fn(rgx);
-	t.same(keys, false, '~> keys = false');
-	t.same(rgx, pattern, '~> pattern = input');
+	test('(RegExp) param :: optional', t => {
+		let rgx = /^\/books[/](?<author>[^/]+)[/]?(?<title>[^/]+)?[/]?$/
+		let { keys, pattern } = fn(rgx);
+		t.same(keys, false, '~> keys = false');
+		t.same(rgx, pattern, '~> pattern = input');
 
-	// RegExp testing (not regexparam related)
-	t.false(pattern.test('/books'));
-	t.false(pattern.test('/books/'));
-	t.true(pattern.test('/books/smith'));
-	t.true(pattern.test('/books/smith/'));
-	t.true(pattern.test('/books/smith/narnia'));
-	t.true(pattern.test('/books/smith/narnia/'));
-	t.false(pattern.test('/books/smith/narnia/reviews'));
-	t.false(pattern.test('books/smith/narnia'));
+		// RegExp testing (not regexparam related)
+		t.false(pattern.test('/books'));
+		t.false(pattern.test('/books/'));
+		t.true(pattern.test('/books/smith'));
+		t.true(pattern.test('/books/smith/'));
+		t.true(pattern.test('/books/smith/narnia'));
+		t.true(pattern.test('/books/smith/narnia/'));
+		t.false(pattern.test('/books/smith/narnia/reviews'));
+		t.false(pattern.test('books/smith/narnia'));
 
-	// exec results, array access
-	let [url, author, title] = pattern.exec('/books/smith/narnia/');
-	t.is(url, '/books/smith/narnia/', '~> executing pattern on correct trimming');
-	t.is(author, 'smith', '~> executing pattern gives correct value');
-	t.is(title, 'narnia', '~> executing pattern gives correct value');
+		// exec results, array access
+		let [url, author, title] = pattern.exec('/books/smith/narnia/');
+		t.is(url, '/books/smith/narnia/', '~> executing pattern on correct trimming');
+		t.is(author, 'smith', '~> executing pattern gives correct value');
+		t.is(title, 'narnia', '~> executing pattern gives correct value');
 
-	// exec results, named object
-	t.toExec(rgx, '/books/smith/narnia', { author: 'smith', title: 'narnia' });
-	t.toExec(rgx, '/books/smith/narnia/', { author: 'smith', title: 'narnia' });
-	t.toExec(rgx, '/books/smith/', { author: 'smith', title: undefined });
+		// exec results, named object
+		t.toExec(rgx, '/books/smith/narnia', { author: 'smith', title: 'narnia' });
+		t.toExec(rgx, '/books/smith/narnia/', { author: 'smith', title: 'narnia' });
+		t.toExec(rgx, '/books/smith/', { author: 'smith', title: undefined });
 
-	t.end();
-});
-
-test('param :: optional', t => {
-	let { keys, pattern } = fn('/books/:author/:title?');
-	t.same(keys, ['author', 'title'], '~> keys has "author" & "title" values');
-	t.false(pattern.test('/books'), '~> does not match naked base');
-	t.false(pattern.test('/books/'), '~> does not match naked base w/ trailing slash');
-	t.true(pattern.test('/books/smith'), '~> matches when optional parameter is missing counts');
-	t.true(pattern.test('/books/smith/'), '~> matches when optional paramter is missing w/ trailing slash');
-	t.true(pattern.test('/books/smith/narnia'), '~> matches when fully populated');
-	t.true(pattern.test('/books/smith/narnia/'), '~> matches when fully populated w/ trailing slash');
-	t.false(pattern.test('/books/smith/narnia/reviews'), '~> does not match extra bits');
-	t.false(pattern.test('books/smith/narnia'), '~> does not match path without lead slash');
-	let [_, author, title] = pattern.exec('/books/smith/narnia');
-	t.is(author, 'smith', '~> executing pattern gives correct value');
-	t.is(title, 'narnia', '~> executing pattern gives correct value');
-	t.end();
-});
+		t.end();
+	});
+}
 
 test('(RegExp) nameless', t => {
 	// For whatever reason~
