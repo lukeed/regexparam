@@ -128,7 +128,7 @@ Returns: `Object`
 Returns a `{ keys, pattern }` object, where `pattern` is a generated `RegExp` instance and `keys` is a list of extracted parameter names.
 
 #### str
-Type: `String` or `RegExp`
+Type: `String`
 
 The route/pathing string to convert.
 
