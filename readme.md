@@ -87,14 +87,48 @@ exec('/users/lukeed/repos/new', baz);
 
 > **Important:** When matching/testing against a generated RegExp, your path **must** begin with a leading slash (`"/"`)!
 
+## Regular Expressions
+
+For fine-tuned control, you may pass a `RegExp` value directly to `regexparam` as its only parameter.
+
+In these situations, `regexparam` **does not** parse nor manipulate your pattern in any way! Because of this, `regexparam` has no "insight" on your route, and instead trusts your input fully. In code, this means that the return value's `keys` is always equal to `false` and the `pattern` is identical to your input value.
+
+This also means that you must manage and parse your own `keys`~!<br>
+You may use [named capture groups](https://javascript.info/regexp-groups#named-groups) or traverse the matched segments manually the "old-fashioned" way:
+
+> **Important:** Please check your target browsers' and target [Node.js runtimes' support](https://node.green/#ES2018-features--RegExp-named-capture-groups)!
+
+```js
+// Named capture group
+const named = regexparam(/^\/posts[/](?<year>[0-9]{4})[/](?<month>[0-9]{2})[/](?<title>[^\/]+)/i);
+const { groups } = named.pattern.exec('/posts/2019/05/hello-world');
+console.log(groups);
+//=> { year: '2019', month: '05', title: 'hello-world' }
+
+// Widely supported / "Old-fashioned"
+const named = regexparam(/^\/posts[/]([0-9]{4})[/]([0-9]{2})[/]([^\/]+)/i);
+const [url, year, month, title] = named.pattern.exec('/posts/2019/05/hello-world');
+console.log(year, month, title);
+//=> 2019 05 hello-world
+```
+
 
 ## API
+
+There are two API variants:
+
+1) When passing a `String` input, the `loose` parameter is able to affect the output. [View API](#regexparamstr-loose)
+
+2) When passing a `RegExp` value, that must be `regexparam`'s _only_ argument.<br>
+Your pattern is saved as written, so `loose` is ignored entirely. [View API](#regexparamrgx)
 
 ### regexparam(str, loose)
 Returns: `Object`
 
+Returns a `{ keys, pattern }` object, where `pattern` is a generated `RegExp` instance and `keys` is a list of extracted parameter names.
+
 #### str
-Type: `String`
+Type: `String` or `RegExp`
 
 The route/pathing string to convert.
 
@@ -116,6 +150,18 @@ rgx('/users', true).pattern.test('/users/lukeed'); //=> true
 rgx('/users/:name').pattern.test('/users/lukeed/repos'); //=> false
 rgx('/users/:name', true).pattern.test('/users/lukeed/repos'); //=> true
 ```
+
+### regexparam(rgx)
+Returns: `Object`
+
+Returns a `{ keys, pattern }` object, where pattern is _identical_ to your `rgx` and `keys` is `false`, always.
+
+#### rgx
+Type: `RegExp`
+
+Your RegExp pattern.
+
+> **Important:** This pattern is used _as is_! No parsing or interpreting is done on your behalf.
 
 
 ## Related
