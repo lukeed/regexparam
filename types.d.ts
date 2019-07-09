@@ -1,6 +1,11 @@
-export interface RouteParsed {
+declare function regexparam(route: string, loose?: boolean): {
 	keys: Array<string>,
 	pattern: RegExp
 }
-declare const regexparam: (route: string, loose?: boolean) => RouteParsed;
+
+declare function regexparam(route: RegExp): {
+	keys: false,
+	pattern: RegExp
+}
+
 export default regexparam;
