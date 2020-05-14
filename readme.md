@@ -168,6 +168,7 @@ Your RegExp pattern.
 
 - [trouter](https://github.com/lukeed/trouter) - A server-side HTTP router that extends from this module.
 - [matchit](https://github.com/lukeed/matchit) - Similar (650B) library, but relies on String comparison instead of `RegExp`s.
+- [u8-mqtt](https://github.com/shanewholloway/js-u8-mqtt) - An MQTT client that embeds `regexparam` for routing published packets by topic.
 
 
 ## License
