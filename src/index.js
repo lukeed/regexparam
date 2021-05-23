@@ -1,4 +1,4 @@
-export default function (str, loose) {
+export function parse(str, loose) {
 	if (str instanceof RegExp) return { keys:false, pattern:str };
 	var c, o, tmp, ext, keys=[], pattern='', arr = str.split('/');
 	arr[0] || arr.shift();

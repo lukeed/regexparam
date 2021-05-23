@@ -1,6 +1,6 @@
 import { test } from 'uvu';
 import * as assert from 'uvu/assert';
-import parse from '../src';
+import { parse } from '../src';
 
 const hasNamedGroups = 'groups' in /x/.exec('x');
 
