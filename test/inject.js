@@ -63,6 +63,8 @@ run('/foo/:id/:a?/:b?/:bar?', '/foo/123/bb', { id: 123, b: 'bb' });
 run('/foo/:id/:a?/:b?/:bar?', '/foo/123/xxx', { id: 123, bar: 'xxx' });
 run('/foo/:id/:a?/:b?/:bar?', '/foo/123/aa/xxx', { id: 123, a: 'aa', bar: 'xxx' });
 
+run('/foo/:bar/*', '/foo/123', { bar: '123' });
+run('/foo/:bar/*', '/foo/123/aa/bb/cc', { bar: '123', wild: 'aa/bb/cc' });
 
 // NOTE: Missing non-optional values
 // ---
