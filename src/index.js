@@ -29,8 +29,8 @@ var RGX = /*#__PURE__*/ /(\/|^)([:*][^\/]*?)(\?)?(?=[\/.]|$)/g;
 
 // error if key missing?
 export function inject(route, values) {
-	return route.replace(RGX, (_, start, key, optional) => {
-		if (_ = values[key.substring(1)]) return '/' + _;
-		return optional ? '' : '/' + key;
+	return route.replace(RGX, (x, lead, key, optional) => {
+		x = values[key=='*' ? 'wild' : key.substring(1)];
+		return x ? '/'+x : (optional || key=='*') ? '' : '/' + key;
 	});
 }
