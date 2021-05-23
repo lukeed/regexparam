@@ -1,4 +1,4 @@
-# regexparam [![Build Status](https://badgen.now.sh/travis/lukeed/regexparam)](https://travis-ci.org/lukeed/regexparam)
+# regexparam [![CI](https://github.com/lukeed/regexparam/actions/workflows/ci.yml/badge.svg)](https://github.com/lukeed/regexparam/actions/workflows/ci.yml)
 
 > A tiny (308B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
 
