@@ -2,7 +2,7 @@
   "name": "regexparam",
   "version": "1.3.0",
   "repository": "lukeed/regexparam",
-  "description": "A tiny (306B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
+  "description": "A tiny (394B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
   "unpkg": "dist/index.min.js",
   "module": "dist/index.mjs",
   "main": "dist/index.js",
@@ -34,7 +34,9 @@
   "keywords": [
     "regexp",
     "route",
-    "routing"
+    "routing",
+    "inject",
+    "parse"
   ],
   "devDependencies": {
     "bundt": "1.1.2",
