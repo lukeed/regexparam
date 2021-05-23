@@ -14,10 +14,11 @@ Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this modu
 * Optional Parameters (`/:title?`, `/books/:title?`, `/books/:genre/:title?`)
 * Wildcards (`*`, `/books/*`, `/books/:genre/*`)
 
-This module exposes two module definitions:
+This module exposes three module definitions:
 
-* **CommonJS**: `dist/regexparam.js`
-* **ESModule**: `dist/regexparam.mjs`
+* **CommonJS**: [`dist/index.js`](https://unpkg.com/regexparam/dist/index.js)
+* **ESModule**: [`dist/index.mjs`](https://unpkg.com/regexparam/dist/index.mjs)
+* **UMD**: [`dist/index.min.js`](https://unpkg.com/regexparam/dist/index.min.js)
 
 ## Install
 
@@ -29,7 +30,7 @@ $ npm install --save regexparam
 ## Usage
 
 ```js
-import { parse } from 'regexparam';
+import { parse, inject } from 'regexparam';
 
 // Example param-assignment
 function exec(path, result) {
@@ -83,6 +84,42 @@ baz.pattern.test('/users/lukeed'); //=> true
 
 exec('/users/lukeed/repos/new', baz);
 //=> { wild: 'lukeed/repos/new' }
+
+
+// Injecting
+// ---
+
+inject('/users/:id', {
+  id: 'lukeed'
+}); //=> '/users/lukeed'
+
+inject('/movies/:title.mp4', {
+  title: 'narnia'
+}); //=> '/movies/narnia.mp4'
+
+inject('/:foo/:bar?/:baz?', {
+  foo: 'aaa'
+}); //=> '/aaa'
+
+inject('/:foo/:bar?/:baz?', {
+  foo: 'aaa',
+  baz: 'ccc'
+}); //=> '/aaa/ccc'
+
+inject('/posts/:slug/*', {
+  slug: 'hello',
+}); //=> '/posts/hello'
+
+inject('/posts/:slug/*', {
+  slug: 'hello',
+  wild: 'x/y/z',
+}); //=> '/posts/hello/x/y/z'
+
+// Missing non-optional value
+// ~> keeps the pattern in output
+inject('/hello/:world', {
+  abc: 123
+}); //=> '/hello/:world'
 ```
 
 > **Important:** When matching/testing against a generated RegExp, your path **must** begin with a leading slash (`"/"`)!
@@ -115,31 +152,33 @@ console.log(year, month, title);
 
 ## API
 
-There are two API variants:
-
-1) When passing a `String` input, the `loose` parameter is able to affect the output. [View API](#regexparamstr-loose)
-
-2) When passing a `RegExp` value, that must be `regexparam`'s _only_ argument.<br>
-Your pattern is saved as written, so `loose` is ignored entirely. [View API](#regexparamrgx)
-
-### regexparam.parse(str, loose)
+### regexparam.parse(input: RegExp)
+### regexparam.parse(input: string, loose?: boolean)
 Returns: `Object`
 
-Returns a `{ keys, pattern }` object, where `pattern` is a generated `RegExp` instance and `keys` is a list of extracted parameter names.
+Parse a route pattern into an equivalent RegExp pattern. Also collects the names of pattern's parameters as a `keys` array. An `input` that's already a RegExp is kept as is, and `regexparam` makes no additional insights.
 
-#### str
-Type: `String`
+Returns a `{ keys, pattern }` object, where `pattern` is always a `RegExp` instance and `keys` is either `false` or a list of extracted parameter names.
 
-The route/pathing string to convert.
+> **Important:** The `keys` will _always_ be `false` when `input` is a RegExp and it will _always_ be an Array when `input` is a string.
 
-> **Note:** It does not matter if your `str` begins with a `/` &mdash; it will be added if missing.
+#### input
+Type: `string` or `RegExp`
+
+When `input` is a string, it's treated as a route pattern and an equivalent RegExp is generated.
+
+> **Note:** It does not matter if `input` strings begin with a `/` &mdash; it will be added if missing.
+
+When `input` is a RegExp, it will be used **as is** – no modifications will be made.
 
 #### loose
-Type: `Boolean`<br>
+Type: `boolean`<br>
 Default: `false`
 
 Should the `RegExp` match URLs that are longer than the [`str`](#str) pattern itself?<br>
 By default, the generated `RegExp` will test that the URL begins and _ends with_ the pattern.
+
+> **Important:** When `input` is a RegExp, the `loose` argument is ignored!
 
 ```js
 const { parse } = require('regexparam');
@@ -151,17 +190,25 @@ parse('/users/:name').pattern.test('/users/lukeed/repos'); //=> false
 parse('/users/:name', true).pattern.test('/users/lukeed/repos'); //=> true
 ```
 
-### regexparam.parse(rgx)
-Returns: `Object`
 
-Returns a `{ keys, pattern }` object, where pattern is _identical_ to your `rgx` and `keys` is `false`, always.
+### regexparam.inject(pattern: string, values: object)
+Returns: `string`
 
-#### rgx
-Type: `RegExp`
+Returns a new string by replacing the `pattern` segments/parameters with their matching values.
 
-Your RegExp pattern.
+> **Important:** Named segments (eg, `/:name`) that _do not_ have a `values` match will be kept in the output. This is true _except for_ optional segments (eg, `/:name?`) and wildcard segments (eg, `/*`).
 
-> **Important:** This pattern is used _as is_! No parsing or interpreting is done on your behalf.
+#### pattern
+Type: `string`
+
+The route pattern that to receive injections.
+
+#### values
+Type: `Record<string, string>`
+
+The values to be injected. The keys within `values` must match the `pattern`'s segments in order to be replaced.
+
+> **Note:** To replace a wildcard segment (eg, `/*`), define a `values.wild` key.
 
 
 ## Related
