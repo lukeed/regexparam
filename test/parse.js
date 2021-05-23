@@ -33,15 +33,23 @@ function toLooseExec(route, url, params) {
 
 // ---
 
-test('regexparam', () => {
-	assert.type(parse, 'function', 'exports a function');
+test('exports', () => {
+	assert.type(parse, 'function');
+});
 
-	let foo = parse('/');
-	assert.type(foo, 'object', 'output is an object');
-	assert.ok(foo.pattern, '~> has "pattern" key');
-	assert.ok(foo.pattern instanceof RegExp, '~~> is a RegExp')
-	assert.ok(foo.keys, '~> has "keys" key');
-	assert.ok(Array.isArray(foo.keys), '~~> is an Array');
+test('returns :: string', () => {
+	let output = parse('/');
+	assert.type(output, 'object');
+	assert.instance(output.pattern, RegExp);
+	assert.instance(output.keys, Array);
+});
+
+test('returns :: RegExp', () => {
+	let pattern = /foobar/;
+	let output = parse(pattern);
+	assert.type(output, 'object');
+	assert.is(output.pattern, pattern, 'referential');
+	assert.is(output.keys, false);
 });
 
 test('ensure lead slash', () => {
