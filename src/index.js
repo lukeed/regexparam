@@ -24,3 +24,13 @@ export function parse(str, loose) {
 		pattern: new RegExp('^' + pattern + (loose ? '(?=$|\/)' : '\/?$'), 'i')
 	};
 }
+
+var RGX = /*#__PURE__*/ /(\/|^)([:*][^\/]*?)(\?)?(?=[\/.]|$)/g;
+
+// error if key missing?
+export function inject(route, values) {
+	return route.replace(RGX, (_, start, key, optional) => {
+		if (_ = values[key.substring(1)]) return '/' + _;
+		return optional ? '' : '/' + key;
+	});
+}
