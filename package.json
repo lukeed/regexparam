@@ -3,10 +3,9 @@
   "version": "1.3.0",
   "repository": "lukeed/regexparam",
   "description": "A tiny (308B) utility that converts route patterns into RegExp. Limited alternative to `path-to-regexp` 🙇‍",
-  "unpkg": "dist/regexparam.min.js",
-  "module": "dist/regexparam.mjs",
-  "main": "dist/regexparam.js",
-  "types": "types.d.ts",
+  "unpkg": "dist/index.min.js",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
   "license": "MIT",
   "author": {
     "name": "Luke Edwards",
@@ -31,7 +30,7 @@
     "routing"
   ],
   "devDependencies": {
-    "bundt": "^0.3.0",
+    "bundt": "1.1.2",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0"
   }
