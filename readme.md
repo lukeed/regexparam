@@ -1,6 +1,6 @@
 # regexparam [![CI](https://github.com/lukeed/regexparam/actions/workflows/ci.yml/badge.svg)](https://github.com/lukeed/regexparam/actions/workflows/ci.yml)
 
-> A tiny (308B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
+> A tiny (306B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
 
 With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regular expression.
 
@@ -29,7 +29,7 @@ $ npm install --save regexparam
 ## Usage
 
 ```js
-const regexparam = require('regexparam');
+import { parse } from 'regexparam';
 
 // Example param-assignment
 function exec(path, result) {
@@ -44,7 +44,7 @@ function exec(path, result) {
 
 // Parameter, with Optional Parameter
 // ---
-let foo = regexparam('/books/:genre/:title?')
+let foo = parse('/books/:genre/:title?')
 // foo.pattern => /^\/books\/([^\/]+?)(?:\/([^\/]+?))?\/?$/i
 // foo.keys => ['genre', 'title']
 
@@ -60,7 +60,7 @@ exec('/books/horror/goosebumps', foo);
 
 // Parameter, with suffix
 // ---
-let bar = regexparam('/movies/:title.(mp4|mov)');
+let bar = parse('/movies/:title.(mp4|mov)');
 // bar.pattern => /^\/movies\/([^\/]+?)\.(mp4|mov)\/?$/i
 // bar.keys => ['title']
 
@@ -74,7 +74,7 @@ exec('/movies/narnia.mp4', bar);
 
 // Wildcard
 // ---
-let baz = regexparam('users/*');
+let baz = parse('users/*');
 // baz.pattern => /^\/users\/(.*)\/?$/i
 // baz.keys => ['wild']
 
@@ -100,13 +100,13 @@ You may use [named capture groups](https://javascript.info/regexp-groups#named-g
 
 ```js
 // Named capture group
-const named = regexparam(/^\/posts[/](?<year>[0-9]{4})[/](?<month>[0-9]{2})[/](?<title>[^\/]+)/i);
+const named = regexparam.parse(/^\/posts[/](?<year>[0-9]{4})[/](?<month>[0-9]{2})[/](?<title>[^\/]+)/i);
 const { groups } = named.pattern.exec('/posts/2019/05/hello-world');
 console.log(groups);
 //=> { year: '2019', month: '05', title: 'hello-world' }
 
 // Widely supported / "Old-fashioned"
-const named = regexparam(/^\/posts[/]([0-9]{4})[/]([0-9]{2})[/]([^\/]+)/i);
+const named = regexparam.parse(/^\/posts[/]([0-9]{4})[/]([0-9]{2})[/]([^\/]+)/i);
 const [url, year, month, title] = named.pattern.exec('/posts/2019/05/hello-world');
 console.log(year, month, title);
 //=> 2019 05 hello-world
@@ -122,7 +122,7 @@ There are two API variants:
 2) When passing a `RegExp` value, that must be `regexparam`'s _only_ argument.<br>
 Your pattern is saved as written, so `loose` is ignored entirely. [View API](#regexparamrgx)
 
-### regexparam(str, loose)
+### regexparam.parse(str, loose)
 Returns: `Object`
 
 Returns a `{ keys, pattern }` object, where `pattern` is a generated `RegExp` instance and `keys` is a list of extracted parameter names.
@@ -142,16 +142,16 @@ Should the `RegExp` match URLs that are longer than the [`str`](#str) pattern it
 By default, the generated `RegExp` will test that the URL begins and _ends with_ the pattern.
 
 ```js
-const rgx = require('regexparam');
+const { parse } = require('regexparam');
 
-rgx('/users').pattern.test('/users/lukeed'); //=> false
-rgx('/users', true).pattern.test('/users/lukeed'); //=> true
+parse('/users').pattern.test('/users/lukeed'); //=> false
+parse('/users', true).pattern.test('/users/lukeed'); //=> true
 
-rgx('/users/:name').pattern.test('/users/lukeed/repos'); //=> false
-rgx('/users/:name', true).pattern.test('/users/lukeed/repos'); //=> true
+parse('/users/:name').pattern.test('/users/lukeed/repos'); //=> false
+parse('/users/:name', true).pattern.test('/users/lukeed/repos'); //=> true
 ```
 
-### regexparam(rgx)
+### regexparam.parse(rgx)
 Returns: `Object`
 
 Returns a `{ keys, pattern }` object, where pattern is _identical_ to your `rgx` and `keys` is `false`, always.

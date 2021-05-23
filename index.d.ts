@@ -1,11 +1,9 @@
-declare function regexparam(route: string, loose?: boolean): {
-	keys: Array<string>,
-	pattern: RegExp
+export function parse(route: string, loose?: boolean): {
+	keys: string[];
+	pattern: RegExp;
 }
 
-declare function regexparam(route: RegExp): {
-	keys: false,
-	pattern: RegExp
+export function parse(route: RegExp): {
+	keys: false;
+	pattern: RegExp;
 }
-
-export default regexparam;
