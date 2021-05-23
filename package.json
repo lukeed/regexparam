@@ -20,6 +20,13 @@
     "build": "bundt",
     "test": "uvu -r esm test"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "*.d.ts",
     "dist"
