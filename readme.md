@@ -211,6 +211,21 @@ The values to be injected. The keys within `values` must match the `pattern`'s s
 > **Note:** To replace a wildcard segment (eg, `/*`), define a `values.wild` key.
 
 
+## Deno
+
+As of version `1.3.0`, you may use `regexparam` with Deno. These options are all valid:
+
+```ts
+// The official Deno registry:
+import regexparam from 'https://deno.land/x/regexparam/src/index.js';
+// Third-party CDNs with ESM support:
+import regexparam from 'https://cdn.skypack.dev/regexparam';
+import regexparam from 'https://esm.sh/regexparam';
+```
+
+> **Note:** All registries support versioned URLs, if desired. The above examples always resolve to the latest published version.
+
+
 ## Related
 
 - [trouter](https://github.com/lukeed/trouter) - A server-side HTTP router that extends from this module.
