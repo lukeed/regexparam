@@ -223,7 +223,7 @@ import regexparam from 'https://cdn.skypack.dev/regexparam';
 import regexparam from 'https://esm.sh/regexparam';
 ```
 
-> **Note:** All registries support versioned URLs, if desired. The above examples always resolve to the latest published version.
+> **Note:** All registries support versioned URLs, if desired. <br>The above examples always resolve to the latest published version.
 
 
 ## Related
