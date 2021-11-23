@@ -74,6 +74,6 @@ run('/foo/:id/', '/foo/:id/', { /* empty */ });
 run('/:a/:b/:c', '/1/:b/:c', { a: 1 });
 run('/:a/:b/:c', '/1/:b/3', { a: 1, c: 3 });
 
-run('/:num(\\d+)', '/1', {num:1})
+run('/:num(\\d+)', '/1', { num: 1 });
 
 test.run();
