@@ -753,4 +753,20 @@ test('(RegExp) nameless', () => {
 	toExec(rgx, '/books/smith/', {});
 });
 
+test('param condition', () => {
+	let {keys,pattern} = parse('/:num(\\d+)')
+	console.log(pattern.source)
+	assert.equal(keys, ['num'])
+	assert.ok(pattern.test('/0'));
+	assert.ok(pattern.test('/123'));
+	assert.not.ok(pattern.test('/abc'));
+});
+
+test('param condition with extension', () => {
+	let {keys,pattern} = parse('/:num(\\d+).mp3');
+	assert.equal(keys, ['num']);
+	assert.ok(pattern.test('/123.mp3'));
+	assert.not.ok(pattern.test('/123'));
+});
+
 test.run();
