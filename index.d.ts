@@ -23,6 +23,8 @@ export type RouteParams<T extends string> =
 		? { [K in P]?: string }
 	: T extends `${string}:${infer P}`
 		? { [K in P]: string }
+	: T extends `${string}*.${string}`
+		? { wild: string }
 	: T extends `${string}*`
 		? { wild: string }
 	: {};
