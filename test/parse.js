@@ -6,13 +6,13 @@ const hasNamedGroups = 'groups' in /x/.exec('x');
 
 function run(route, url, loose) {
 	let i=0, out={}, result=parse(route, !!loose);
-  let matches = result.pattern.exec(url);
-  if (matches === null) return false;
-  if (matches.groups) return matches.groups;
-  while (i < result.keys.length) {
-    out[ result.keys[i] ] = matches[++i] || null;
-  }
-  return out;
+	let matches = result.pattern.exec(url);
+	if (matches === null) return false;
+	if (matches.groups) return matches.groups;
+	while (i < result.keys.length) {
+		out[ result.keys[i] ] = matches[++i] || null;
+	}
+	return out;
 }
 
 function raw(route, url, loose) {
