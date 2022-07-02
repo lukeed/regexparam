@@ -31,8 +31,7 @@ test('throws', () => {
 		assert.unreachable('should throw');
 	} catch (err) {
 		assert.instance(err, TypeError);
-		assert.match(err.message, 'Cannot read');
-		assert.match(err.message, 'of undefined');
+		assert.match(err.message, /Cannot read propert(ies|y 'foo') of undefined/);
 	}
 });
 
