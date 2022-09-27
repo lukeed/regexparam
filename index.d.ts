@@ -21,6 +21,8 @@ export type RouteParams<T extends string> =
 		? { [K in P]: string }
 	: T extends `${string}*`
 		? { wild: string }
+	: T extends `${string}*?`
+		? { wild: string | null }
 	: {};
 
 export function inject<T extends string>(route: T, values: RouteParams<T>): string;

@@ -290,7 +290,7 @@ test('execs', () => {
 	toExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
 
 	// console.log('/books/*?');
-	toExec('/books/*?', '/books', false);
+	toExec('/books/*?', '/books', { wild:null });
 	toExec('/books/*?', '/books/', { wild:null });
 	toExec('/books/*?', '/books/world', { wild:'world' });
 	toExec('/books/*?', '/books/world/', { wild:'world/' });
@@ -354,7 +354,7 @@ test('execs :: loose', () => {
 	toLooseExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
 
 	// console.log('/books/*?');
-	toLooseExec('/books/*?', '/books', false);
+	toLooseExec('/books/*?', '/books', { wild:null });
 	toLooseExec('/books/*?', '/books/', { wild:null });
 	toLooseExec('/books/*?', '/books/world', { wild:'world' });
 	toLooseExec('/books/*?', '/books/world/', { wild:'world/' });
