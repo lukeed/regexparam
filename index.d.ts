@@ -22,7 +22,7 @@ export type RouteParams<T extends string> =
 	: T extends `${string}*`
 		? { wild: string }
 	: T extends `${string}*?`
-		? { wild: string | null }
+		? { wild?: string }
 	: {};
 
 export function inject<T extends string>(route: T, values: RouteParams<T>): string;
