@@ -36,7 +36,7 @@ import { parse, inject } from 'regexparam';
 // Example param-assignment
 function exec(path, result) {
   let i=0, out={};
-  let matches = result.pattern.exec(path) || [];
+  let matches = result.pattern.exec(path);
   while (i < result.keys.length) {
     out[ result.keys[i] ] = matches[++i] || null;
   }
@@ -82,11 +82,7 @@ let baz = parse('users/*');
 
 baz.pattern.test('/users'); //=> false
 baz.pattern.test('/users/lukeed'); //=> true
-
-exec('/users', baz);
-//=> { wild: 'lukeed/repos/new' }
-exec('/users/lukeed/repos/new', baz);
-//=> { wild: 'lukeed/repos/new' }
+baz.pattern.test('/users/'); //=> true
 
 
 // Optional Wildcard
@@ -97,11 +93,7 @@ let baz = parse('/users/*?');
 
 baz.pattern.test('/users'); //=> true
 baz.pattern.test('/users/lukeed'); //=> true
-
-exec('/users', baz);
-//=> { wild: null }
-exec('/users/lukeed/repos/new', baz);
-//=> { wild: 'lukeed/repos/new' }
+baz.pattern.test('/users/'); //=> true
 
 
 // Injecting
