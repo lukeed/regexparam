@@ -25,7 +25,7 @@ export function parse(str, loose) {
 	};
 }
 
-var RGX = /*#__PURE__*/ /(\/|^)([:*][^/]*?)(\?)?(?=[/.]|$)/g;
+var RGX = /(\/|^)([:*][^/]*?)(\?)?(?=[/.]|$)/g;
 
 // error if key missing?
 export function inject(route, values) {
