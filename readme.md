@@ -1,6 +1,6 @@
 # regexparam [![CI](https://github.com/lukeed/regexparam/actions/workflows/ci.yml/badge.svg)](https://github.com/lukeed/regexparam/actions/workflows/ci.yml)
 
-> A tiny (394B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
+> A tiny (405B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
 
 With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regular expression.
 
@@ -13,6 +13,7 @@ Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this modu
 * Parameter w/ Suffix (`/movies/:title.mp4`, `/movies/:title.(mp4|mov)`)
 * Optional Parameters (`/:title?`, `/books/:title?`, `/books/:genre/:title?`)
 * Wildcards (`*`, `/books/*`, `/books/:genre/*`)
+* Optional Wildcard (`/books/*?`)
 
 This module exposes three module definitions:
 
@@ -35,7 +36,7 @@ import { parse, inject } from 'regexparam';
 // Example param-assignment
 function exec(path, result) {
   let i=0, out={};
-  let matches = result.pattern.exec(path);
+  let matches = result.pattern.exec(path) || [];
   while (i < result.keys.length) {
     out[ result.keys[i] ] = matches[++i] || null;
   }
@@ -82,6 +83,23 @@ let baz = parse('users/*');
 baz.pattern.test('/users'); //=> false
 baz.pattern.test('/users/lukeed'); //=> true
 
+exec('/users', baz);
+//=> { wild: 'lukeed/repos/new' }
+exec('/users/lukeed/repos/new', baz);
+//=> { wild: 'lukeed/repos/new' }
+
+
+// Optional Wildcard
+// ---
+let baz = parse('/users/*?');
+// baz.pattern => /^\/users(?:\/(.*))?(?=$|\/)/i
+// baz.keys => ['wild']
+
+baz.pattern.test('/users'); //=> true
+baz.pattern.test('/users/lukeed'); //=> true
+
+exec('/users', baz);
+//=> { wild: null }
 exec('/users/lukeed/repos/new', baz);
 //=> { wild: 'lukeed/repos/new' }
 

@@ -7,7 +7,7 @@ export function parse(str, loose) {
 		c = tmp[0];
 		if (c === '*') {
 			keys.push('wild');
-			pattern += '/(.*)';
+			pattern += tmp[1] === '?' ? '(?:/(.*))?' : '/(.*)';
 		} else if (c === ':') {
 			o = tmp.indexOf('?', 1);
 			ext = tmp.indexOf('.', 1);
