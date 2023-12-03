@@ -1,6 +1,6 @@
 # regexparam [![CI](https://github.com/lukeed/regexparam/actions/workflows/ci.yml/badge.svg)](https://github.com/lukeed/regexparam/actions/workflows/ci.yml)
 
-> A tiny (394B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
+> A tiny (405B) utility that converts route patterns into RegExp. Limited alternative to [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp) 🙇
 
 With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regular expression.
 
@@ -87,6 +87,7 @@ exec('/users', baz);
 //=> { wild: 'lukeed/repos/new' }
 exec('/users/lukeed/repos/new', baz);
 //=> { wild: 'lukeed/repos/new' }
+
 
 // Optional Wildcard
 // ---
