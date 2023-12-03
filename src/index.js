@@ -1,12 +1,16 @@
-export function parse(str, loose) {
-	if (str instanceof RegExp) return { keys:false, pattern:str };
-	var c, o, tmp, ext, keys=[], pattern='', arr = str.split('/');
+/**
+ * @param {string|RegExp} input The route pattern
+ * @param {boolean} [loose] Allow open-ended matching. Ignored with `RegExp` input.
+ */
+export function parse(input, loose) {
+	if (input instanceof RegExp) return { keys:false, pattern:input };
+	var c, o, tmp, ext, keys=[], pattern='', arr = input.split('/');
 	arr[0] || arr.shift();
 
 	while (tmp = arr.shift()) {
 		c = tmp[0];
 		if (c === '*') {
-			keys.push('wild');
+			keys.push(c);
 			pattern += tmp[1] === '?' ? '(?:/(.*))?' : '/(.*)';
 		} else if (c === ':') {
 			o = tmp.indexOf('?', 1);
@@ -30,7 +34,7 @@ var RGX = /(\/|^)([:*][^/]*?)(\?)?(?=[/.]|$)/g;
 // error if key missing?
 export function inject(route, values) {
 	return route.replace(RGX, (x, lead, key, optional) => {
-		x = values[key=='*' ? 'wild' : key.substring(1)];
+		x = values[key=='*' ? key : key.substring(1)];
 		return x ? '/'+x : (optional || key=='*') ? '' : '/' + key;
 	});
 }

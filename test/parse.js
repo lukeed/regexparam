@@ -211,7 +211,7 @@ test('param :: optional :: multiple', () => {
 
 test('wildcard', () => {
 	let { keys, pattern } = parse('/books/*');
-	assert.equal(keys, ['wild'], '~> keys has "wild" value');
+	assert.equal(keys, ['*'], '~> keys has "*" value');
 	assert.not.ok(pattern.test('/books'), '~> does not match naked base');
 	assert.ok(pattern.test('/books/'), '~> does not match naked base w/ trailing slash');
 	assert.ok(pattern.test('/books/narnia'), '~> matches definition');
@@ -224,7 +224,32 @@ test('wildcard', () => {
 
 test('wildcard :: root', () => {
 	let { keys, pattern } = parse('*');
-	assert.equal(keys, ['wild'], '~> keys has "wild" value');
+	assert.equal(keys, ['*'], '~> keys has "*" value');
+	assert.ok(pattern.test('/'), '~> matches root path');
+	assert.ok(pattern.test('/narnia'), '~> matches definition');
+	assert.ok(pattern.test('/narnia/'), '~> matches definition w/ trailing slash');
+	assert.ok(pattern.test('/narnia/reviews'), '~> does not match extra bits');
+	assert.not.ok(pattern.test('narnia'), '~> does not match path without lead slash');
+	let [_, value] = pattern.exec('/foo/bar/baz');
+	assert.is(value, 'foo/bar/baz', '~> executing pattern gives ALL values together');
+});
+
+test('optional wildcard', () => {
+	let { keys, pattern } = parse('/books/*?');
+	assert.equal(keys, ['*'], '~> keys has "*" value');
+	assert.ok(pattern.test('/books'), '~> matches naked base');
+	assert.ok(pattern.test('/books/'), '~> matches naked base w/ trailing slash');
+	assert.ok(pattern.test('/books/narnia'), '~> matches definition');
+	assert.ok(pattern.test('/books/narnia/'), '~> matches definition w/ trailing slash');
+	assert.ok(pattern.test('/books/narnia/reviews'), '~> does not match extra bits');
+	assert.not.ok(pattern.test('books/narnia'), '~> does not match path without lead slash');
+	let [_, value] = pattern.exec('/books/narnia/reviews');
+	assert.is(value, 'narnia/reviews', '~> executing pattern gives ALL values after base');
+});
+
+test('optional wildcard :: root', () => {
+	let { keys, pattern } = parse('*?');
+	assert.equal(keys, ['*'], '~> keys has "*" value');
 	assert.ok(pattern.test('/'), '~> matches root path');
 	assert.ok(pattern.test('/narnia'), '~> matches definition');
 	assert.ok(pattern.test('/narnia/'), '~> matches definition w/ trailing slash');
@@ -283,19 +308,19 @@ test('execs', () => {
 
 	// console.log('/books/*');
 	toExec('/books/*', '/books', false);
-	toExec('/books/*', '/books/', { wild:null });
-	toExec('/books/*', '/books/world', { wild:'world' });
-	toExec('/books/*', '/books/world/', { wild:'world/' });
-	toExec('/books/*', '/books/world/howdy', { wild:'world/howdy' });
-	toExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
+	toExec('/books/*', '/books/', { '*':null });
+	toExec('/books/*', '/books/world', { '*':'world' });
+	toExec('/books/*', '/books/world/', { '*':'world/' });
+	toExec('/books/*', '/books/world/howdy', { '*':'world/howdy' });
+	toExec('/books/*', '/books/world/howdy/', { '*':'world/howdy/' });
 
 	// console.log('/books/*?');
-	toExec('/books/*?', '/books', { wild:null });
-	toExec('/books/*?', '/books/', { wild:null });
-	toExec('/books/*?', '/books/world', { wild:'world' });
-	toExec('/books/*?', '/books/world/', { wild:'world/' });
-	toExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
-	toExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
+	toExec('/books/*?', '/books', { '*':null });
+	toExec('/books/*?', '/books/', { '*':null });
+	toExec('/books/*?', '/books/world', { '*':'world' });
+	toExec('/books/*?', '/books/world/', { '*':'world/' });
+	toExec('/books/*?', '/books/world/howdy', { '*':'world/howdy' });
+	toExec('/books/*?', '/books/world/howdy/', { '*':'world/howdy/' });
 });
 
 test('execs :: loose', () => {
@@ -347,19 +372,19 @@ test('execs :: loose', () => {
 
 	// console.log('/books/*');
 	toLooseExec('/books/*', '/books', false);
-	toLooseExec('/books/*', '/books/', { wild:null });
-	toLooseExec('/books/*', '/books/world', { wild:'world' });
-	toLooseExec('/books/*', '/books/world/', { wild:'world/' });
-	toLooseExec('/books/*', '/books/world/howdy', { wild:'world/howdy' });
-	toLooseExec('/books/*', '/books/world/howdy/', { wild:'world/howdy/' });
+	toLooseExec('/books/*', '/books/', { '*':null });
+	toLooseExec('/books/*', '/books/world', { '*':'world' });
+	toLooseExec('/books/*', '/books/world/', { '*':'world/' });
+	toLooseExec('/books/*', '/books/world/howdy', { '*':'world/howdy' });
+	toLooseExec('/books/*', '/books/world/howdy/', { '*':'world/howdy/' });
 
 	// console.log('/books/*?');
-	toLooseExec('/books/*?', '/books', { wild:null });
-	toLooseExec('/books/*?', '/books/', { wild:null });
-	toLooseExec('/books/*?', '/books/world', { wild:'world' });
-	toLooseExec('/books/*?', '/books/world/', { wild:'world/' });
-	toLooseExec('/books/*?', '/books/world/howdy', { wild:'world/howdy' });
-	toLooseExec('/books/*?', '/books/world/howdy/', { wild:'world/howdy/' });
+	toLooseExec('/books/*?', '/books', { '*':null });
+	toLooseExec('/books/*?', '/books/', { '*':null });
+	toLooseExec('/books/*?', '/books/world', { '*':'world' });
+	toLooseExec('/books/*?', '/books/world/', { '*':'world/' });
+	toLooseExec('/books/*?', '/books/world/howdy', { '*':'world/howdy' });
+	toLooseExec('/books/*?', '/books/world/howdy/', { '*':'world/howdy/' });
 });
 
 test('(raw) exec', () => {

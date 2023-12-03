@@ -78,7 +78,7 @@ exec('/movies/narnia.mp4', bar);
 // ---
 let baz = parse('users/*');
 // baz.pattern => /^\/users\/(.*)\/?$/i
-// baz.keys => ['wild']
+// baz.keys => ['*']
 
 baz.pattern.test('/users'); //=> false
 baz.pattern.test('/users/lukeed'); //=> true
@@ -89,7 +89,7 @@ baz.pattern.test('/users/'); //=> true
 // ---
 let baz = parse('/users/*?');
 // baz.pattern => /^\/users(?:\/(.*))?(?=$|\/)/i
-// baz.keys => ['wild']
+// baz.keys => ['*']
 
 baz.pattern.test('/users'); //=> true
 baz.pattern.test('/users/lukeed'); //=> true
@@ -122,7 +122,7 @@ inject('/posts/:slug/*', {
 
 inject('/posts/:slug/*', {
   slug: 'hello',
-  wild: 'x/y/z',
+  '*': 'x/y/z',
 }); //=> '/posts/hello/x/y/z'
 
 // Missing non-optional value
@@ -218,7 +218,7 @@ Type: `Record<string, string>`
 
 The values to be injected. The keys within `values` must match the `pattern`'s segments in order to be replaced.
 
-> **Note:** To replace a wildcard segment (eg, `/*`), define a `values.wild` key.
+> **Note:** To replace a wildcard segment (eg, `/*`), define a `values['*']` key.
 
 
 ## Deno
