@@ -8,6 +8,11 @@ export function parse(route: RegExp): {
 	pattern: RegExp;
 }
 
+export function parse(route: string | RegExp, loose?: boolean): {
+	keys: string[] | false;
+	pattern: RegExp;
+}
+
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
 		? RouteParams<Prev> & { wild: string } & RouteParams<Rest>
