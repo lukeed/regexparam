@@ -8,6 +8,7 @@
   "main": "dist/index.js",
   "types": "index.d.ts",
   "license": "MIT",
+  "sideEffects": false,
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
