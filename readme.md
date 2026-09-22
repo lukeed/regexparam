@@ -6,7 +6,7 @@ With `regexparam`, you may turn a pathing string (eg, `/users/:id`) into a regul
 
 An object with shape of `{ keys, pattern }` is returned, where `pattern` is the `RegExp` and `keys` is an array of your parameter name(s) in the order that they appeared.
 
-Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this module does not create a `keys` dictionary, nor mutate an existing variable. Also, this only ships a parser, which only accept strings. Similarly, and most importantly, `regexparam` **only** handles basic pathing operators:
+Unlike [`path-to-regexp`](https://github.com/pillarjs/path-to-regexp), this module does not create a `keys` dictionary, nor mutate an existing variable. Most importantly, `regexparam` **only** handles basic pathing operators:
 
 * Static (`/foo`, `/foo/bar`)
 * Parameter (`/:title`, `/books/:title`, `/books/:genre/:title`)
@@ -87,13 +87,13 @@ baz.pattern.test('/users/'); //=> true
 
 // Optional Wildcard
 // ---
-let baz = parse('/users/*?');
-// baz.pattern => /^\/users(?:\/(.*))?(?=$|\/)/i
-// baz.keys => ['*']
+let qux = parse('/users/*?');
+// qux.pattern => /^\/users(?:\/(.*))?\/?$/i
+// qux.keys => ['*']
 
-baz.pattern.test('/users'); //=> true
-baz.pattern.test('/users/lukeed'); //=> true
-baz.pattern.test('/users/'); //=> true
+qux.pattern.test('/users'); //=> true
+qux.pattern.test('/users/lukeed'); //=> true
+qux.pattern.test('/users/'); //=> true
 
 
 // Injecting
@@ -146,6 +146,8 @@ You may use [named capture groups](https://javascript.info/regexp-groups#named-g
 > **Important:** Please check your target browsers' and target [Node.js runtimes' support](https://node.green/#ES2018-features--RegExp-named-capture-groups)!
 
 ```js
+import * as regexparam from 'regexparam';
+
 // Named capture group
 const named = regexparam.parse(/^\/posts[/](?<year>[0-9]{4})[/](?<month>[0-9]{2})[/](?<title>[^\/]+)/i);
 const { groups } = named.pattern.exec('/posts/2019/05/hello-world');
@@ -153,8 +155,8 @@ console.log(groups);
 //=> { year: '2019', month: '05', title: 'hello-world' }
 
 // Widely supported / "Old-fashioned"
-const named = regexparam.parse(/^\/posts[/]([0-9]{4})[/]([0-9]{2})[/]([^\/]+)/i);
-const [url, year, month, title] = named.pattern.exec('/posts/2019/05/hello-world');
+const indexed = regexparam.parse(/^\/posts[/]([0-9]{4})[/]([0-9]{2})[/]([^\/]+)/i);
+const [url, year, month, title] = indexed.pattern.exec('/posts/2019/05/hello-world');
 console.log(year, month, title);
 //=> 2019 05 hello-world
 ```
@@ -227,10 +229,10 @@ As of version `1.3.0`, you may use `regexparam` with Deno. These options are all
 
 ```ts
 // The official Deno registry:
-import regexparam from 'https://deno.land/x/regexparam/src/index.js';
+import * as regexparam from 'https://deno.land/x/regexparam/src/index.js';
 // Third-party CDNs with ESM support:
-import regexparam from 'https://cdn.skypack.dev/regexparam';
-import regexparam from 'https://esm.sh/regexparam';
+import * as regexparam from 'https://cdn.skypack.dev/regexparam';
+import * as regexparam from 'https://esm.sh/regexparam';
 ```
 
 > **Note:** All registries support versioned URLs, if desired. <br>The above examples always resolve to the latest published version.
