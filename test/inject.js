@@ -77,4 +77,12 @@ run('/foo/:id/', '/foo/:id/', { /* empty */ });
 run('/:a/:b/:c', '/1/:b/:c', { a: 1 });
 run('/:a/:b/:c', '/1/:b/3', { a: 1, c: 3 });
 
+// Prototype properties are not supplied route values.
+run('/:constructor/:toString/:__proto__', '/:constructor/:toString/:__proto__', {});
+run('/foo/:constructor?', '/foo', {});
+run('/foo/*', '/foo', Object.create({ '*': 'inherited/path' }));
+run('/:id/:extra?', '/own', Object.assign(Object.create({ extra: 'inherited' }), { id: 'own' }));
+run('/:constructor', '/provided', { constructor: 'provided' });
+run('/:toString', '/provided', Object.assign(Object.create(null), { toString: 'provided' }));
+
 test.run();
