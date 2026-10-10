@@ -35,6 +35,6 @@ var RGX = /(\/|^)([:*][^/]*?)(\?)?(?=[/.]|$)/g;
 export function inject(route, values) {
 	return route.replace(RGX, (x, lead, key, optional) => {
 		x = values[key=='*' ? key : key.substring(1)];
-		return x ? '/'+x : (optional || key=='*') ? '' : '/' + key;
+		return x || x === 0 ? '/'+x : (optional || key=='*') ? '' : '/' + key;
 	});
 }
