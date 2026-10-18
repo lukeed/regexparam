@@ -69,6 +69,23 @@ test('static', () => {
 	assert.not.ok(pattern.test('books'), '~> does not match path without lead slash');
 });
 
+test('static :: literal metacharacters', () => {
+	for (const route of ['/v1.0/docs', '/a+b/c', '/(admin)/panel', '/(admin/panel', '/x[0]/value', '/x{2}/value', '/a|b/c', '/x*y/c', '/x\\y/c']) {
+		const { keys, pattern } = parse(route);
+		assert.equal(keys, []);
+		assert.ok(pattern.test(route), '~> matches the literal route ' + route);
+	}
+	assert.not.ok(parse('/v1.0/docs').pattern.test('/v1x0/docs'));
+	assert.not.ok(parse('/a+b/c').pattern.test('/aaab/c'));
+	assert.not.ok(parse('/(admin)/panel').pattern.test('/admin/panel'));
+});
+
+test('static :: literal metacharacters in loose mode', () => {
+	const { pattern } = parse('/v1.0/docs', true);
+	assert.ok(pattern.test('/v1.0/docs/extra'));
+	assert.not.ok(pattern.test('/v1x0/docs/extra'));
+});
+
 test('static :: multiple', () => {
 	let { keys, pattern } = parse('/foo/bar');
 	assert.equal(keys, [], '~> empty keys');

@@ -19,7 +19,7 @@ export function parse(input, loose) {
 			pattern += !!~o && !~ext ? '(?:/([^/]+?))?' : '/([^/]+?)';
 			if (!!~ext) pattern += (!!~o ? '?' : '') + '\\' + tmp.substring(ext);
 		} else {
-			pattern += '/' + tmp;
+			pattern += '/' + tmp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		}
 	}
 
